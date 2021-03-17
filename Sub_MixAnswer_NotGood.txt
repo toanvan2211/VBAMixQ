@@ -1,0 +1,39 @@
+Sub MixAnswer()
+' Tron cau tra loi
+Dim arr1(4)
+arr1(0) = ActiveDocument.Paragraphs(1).Range.Words(1)
+arr1(1) = ActiveDocument.Paragraphs(2).Range.Words(1)
+arr1(2) = ActiveDocument.Paragraphs(3).Range.Words(1)
+arr1(3) = ActiveDocument.Paragraphs(4).Range.Words(1)
+
+Dim oRang As Range
+Set oRang = ActiveDocument.Paragraphs(5).Range
+Dim iAnswer As Integer, iPosition As Integer
+iAnswer = Int((3 - 0 + 1) * Rnd + 0)
+iPosition = Int((3 - 0 + 1) * Rnd + 0)
+
+If iAnswer = iPosition Then
+ iPosition = iPosition + 1
+ If iPosition > 3 Then
+    iPosition = 0
+    End If
+End If
+'oRang(0).Text = arr1(iAnswer)
+'oRang(0).Bold = True
+Dim i As Integer
+Selection.TypeText "iAnswer: " & iAnswer & " - iPosition: " & iPosition & "." & vbCrLf
+Dim aPick As Integer
+    aPick = Abs(iAnswer - iPosition)
+For i = 1 To 4 Step 1
+    
+    Selection.TypeText Chr(64 + i) & ". "
+    Selection.TypeText arr1(aPick) & vbCrLf
+    aPick = aPick + 1
+    If aPick > 3 Then
+    aPick = 0
+    End If
+    
+Next i
+
+
+End Sub
