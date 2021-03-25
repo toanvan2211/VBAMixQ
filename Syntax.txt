@@ -12,3 +12,15 @@ MyValue = Int((6 * Rnd) + 1) ' Generate random value between 1 and 6.
 {
 Int(lowerbound + Rnd * ( upperbound – lowerbound + 1 ) )
 }
+
+Sub DeleteSelection() 
+ Dim intResponse As Integer 
+ 
+ intResponse = MsgBox("Are you sure you want to " & _ 
+ "delete the contents of the document?", vbYesNo) 
+ 
+ If intResponse = vbYes Then 
+ ActiveDocument.Content.Select 
+ Selection.Delete 
+ End If 
+End Sub
