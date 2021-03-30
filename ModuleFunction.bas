@@ -1,5 +1,5 @@
 Attribute VB_Name = "ModuleFunction"
-Function Mix(coll As Collection, typeMix As Integer)
+Function Mix(coll As Collection, lIndex As Integer, typeMix As Integer)
     Dim rndN, i As Integer
     Dim mRange As Range
     Dim wrdDoc As Document
@@ -20,20 +20,20 @@ Function Mix(coll As Collection, typeMix As Integer)
         paraC3 = 0
         paraC4 = 0
 
-        For i = 1 To coll.Count - 1
-            If i = coll.Count - 1 Then
+        For i = 1 To coll.Count
+            If i = coll.Count Then
                 Set mRange = wrdDoc.Range( _
-                    Start:=wrdDoc.Paragraphs(coll(i)).Range.Start, _
-                    End:=wrdDoc.Paragraphs(coll(i + 1)).Range.End)
+                    Start:=wrdDoc.Paragraphs(coll(i).ParaIndex).Range.Start, _
+                    End:=wrdDoc.Paragraphs(lIndex).Range.End)
             ElseIf i < coll.Count - 1 Then
                 Set mRange = wrdDoc.Range( _
-                    Start:=wrdDoc.Paragraphs(coll(i)).Range.Start, _
-                    End:=wrdDoc.Paragraphs(coll(i + 1) - 1).Range.End)
+                    Start:=wrdDoc.Paragraphs(coll(i).ParaIndex).Range.Start, _
+                    End:=wrdDoc.Paragraphs(coll(i + 1).ParaIndex - 1).Range.End)
             End If
 
             Select Case collNewIndex(i)
                 Case 1:
-                    wrdDoc.Paragraphs(coll(coll.Count) + paraC1).Range.Select
+                    wrdDoc.Paragraphs(lIndex + paraC1).Range.Select
                     Selection.MoveRight
                     mRange.Copy
                     Selection.Paste
@@ -42,7 +42,7 @@ Function Mix(coll As Collection, typeMix As Integer)
                     paraC3 = paraC3 + mRange.Paragraphs.Count
                     paraC4 = paraC4 + mRange.Paragraphs.Count
                 Case 2:
-                    wrdDoc.Paragraphs(coll(coll.Count) + paraC2).Range.Select
+                    wrdDoc.Paragraphs(lIndex + paraC2).Range.Select
                     Selection.MoveRight
                     mRange.Copy
                     Selection.Paste
@@ -50,14 +50,14 @@ Function Mix(coll As Collection, typeMix As Integer)
                     paraC3 = paraC3 + mRange.Paragraphs.Count
                     paraC4 = paraC4 + mRange.Paragraphs.Count
                 Case 3:
-                    wrdDoc.Paragraphs(coll(coll.Count) + paraC3).Range.Select
+                    wrdDoc.Paragraphs(lIndex + paraC3).Range.Select
                     Selection.MoveRight
                     mRange.Copy
                     Selection.Paste
                     paraC3 = paraC3 + mRange.Paragraphs.Count
                     paraC4 = paraC4 + mRange.Paragraphs.Count
                 Case 4:
-                    wrdDoc.Paragraphs(coll(coll.Count) + paraC4).Range.Select
+                    wrdDoc.Paragraphs(lIndex + paraC4).Range.Select
                     Selection.MoveRight
                     mRange.Copy
                     Selection.Paste
@@ -67,15 +67,15 @@ Function Mix(coll As Collection, typeMix As Integer)
 
         'Xoa phan cau hoi cu
         Set mRange = wrdDoc.Range( _
-            Start:=wrdDoc.Paragraphs(coll(1)).Range.Start, _
-            End:=wrdDoc.Paragraphs(coll(coll.Count)).Range.End)
+            Start:=wrdDoc.Paragraphs(coll(1).ParaIndex).Range.Start, _
+            End:=wrdDoc.Paragraphs(lIndex).Range.End)
         mRange.Select
         Selection.Delete
 
         i = 1
         Set mRange = wrdDoc.Range( _
-            Start:=wrdDoc.Paragraphs(coll(1)).Range.Start, _
-            End:=wrdDoc.Paragraphs(coll(coll.Count)).Range.End)
+            Start:=wrdDoc.Paragraphs(coll(1).ParaIndex).Range.Start, _
+            End:=wrdDoc.Paragraphs(lIndex).Range.End)
         
         'Sua lai stt cau hoi
         For Each Paragraph In mRange.Paragraphs
@@ -90,51 +90,24 @@ Function Mix(coll As Collection, typeMix As Integer)
 
     End If
 End Function
-Function FindAnswer(fIndex As Integer, lIndex As Integer) As Collection
-    Dim wrdDoc As Document
-    Set wrdDoc = Application.ActiveDocument
-    'Tao bien chua collection range cua tung cau tra loi
-    Dim collA As Collection
-    Set collA = New Collection
-    
-    Dim i, aC As Integer
-    aC = 0
-    For i = fIndex To lIndex
-        Dim tabA As Variant
-        'Duyet cac cau tra loi cung hang
-        tabA = Split(wrdDoc.Paragraphs(i).Range, vbTab)
-        For Each a In tabA
-            If Left(a, 1) = Chr(65 + c) Then
-                c = c + 1
-                lastIndexQ = i + t
-            End If
-        Next
-    Next i
-    
-End Function
+
 'Function duyet document tim cau hoi
-Function FindQuestion(ByRef collCorrectAns As Collection, ByRef collRAnsQ As Collection) As Collection
+Function FindQuestion(ByRef lastIndexQ As Integer) As Collection
     Dim wrdDoc As Document
     Set wrdDoc = Application.ActiveDocument
     Dim i As Integer
     ' Collection cau hoi
     Dim collQ As Collection
     Set collQ = New Collection
-    ' Collection cau tra loi dung
-    Dim collC As Collection
-    Set collC = New Collection
-    'Collection range cau hoi
-    Dim collRQ As Collection
-    Set collRQ = New Collection
     
-    Dim lastIndexQ As Integer
+    Dim question As QuestionClass
+    
     ' Duyet cac doan trong document
     For Each Paragraph In wrdDoc.Paragraphs
         i = i + 1
         'Kiem tra xem doan van co phai cau hoi hay khong
         If Paragraph.Range.Words(1) = "Câu " Then
-            Dim collRAns As Collection
-            Set collRAns = New Collection
+            Set question = New QuestionClass
             Dim r As Range
             Dim t, c As Integer
             t = 1
@@ -145,7 +118,6 @@ Function FindQuestion(ByRef collCorrectAns As Collection, ByRef collRAnsQ As Col
                 If wrdDoc.Paragraphs(i + t).Range.Words(1) = "Câu " Then
                     Exit Do
                 End If
-                
                 
                 Dim f, chrC As Integer
                 f = 1
@@ -160,12 +132,11 @@ Function FindQuestion(ByRef collCorrectAns As Collection, ByRef collRAnsQ As Col
                             Start:=wrdDoc.Paragraphs(i + t).Range.Characters(f).Start, _
                             End:=wrdDoc.Paragraphs(i + t).Range.Characters(chrC).End)
                         
-                        collRAns.Add r
-                        If collRAns(collRAns.Count).Words(1) = Chr(65 + c) Then
+                        
+                        If r.Words(1) = Chr(65 + c) Then
+                            question.CollRAns.Add r  'Gan tap cac range cau tra loi cho collection collRQ
                             c = c + 1
                             lastIndexQ = i + t
-                        Else
-                            collRAns.Remove (collRAns.Count)
                         End If
                         Exit For
                     ElseIf ch = Chr(9) Then
@@ -176,13 +147,11 @@ Function FindQuestion(ByRef collCorrectAns As Collection, ByRef collRAnsQ As Col
                             Set r = wrdDoc.Range( _
                                 Start:=wrdDoc.Paragraphs(i + t).Range.Characters(f).Start, _
                                 End:=wrdDoc.Paragraphs(i + t).Range.Characters(chrC - 1).End)
-                                                            
-                            collRAns.Add r
-                            If collRAns(collRAns.Count).Words(1) = Chr(65 + c) Then
+                                           
+                            If r.Words(1) = Chr(65 + c) Then
+                                question.CollRAns.Add r
                                 c = c + 1
                                 lastIndexQ = i + t
-                            Else
-                                collRAns.Remove (collRAns.Count)
                             End If
                             f = chrC + 1
                         End If
@@ -196,8 +165,8 @@ Function FindQuestion(ByRef collCorrectAns As Collection, ByRef collRAnsQ As Col
             Loop
             
             If c >= 2 Then
-                collQ.Add i
-                collRQ.Add collRAns 'Gan tap cac range cau tra loi cho collection collRQ
+                question.ParaIndex = i
+                
                 Dim lo As Integer
                 For lo = i + 1 To i + t - 1
                     Dim oFound As Range
@@ -208,33 +177,43 @@ Function FindQuestion(ByRef collCorrectAns As Collection, ByRef collRAnsQ As Col
                     End With
                     oFound.Find.Execute
                     If oFound.Find.Found = True Then
-                        collC.Add CStr(Asc(Mid(oFound.Text, 1, 1)))
+                        question.CorrectAns = Asc(Mid(oFound.Text, 1, 1))
                         Exit For
                     End If
                 Next
-                
+                collQ.Add question
             End If
         End If
     Next
-    Set collCorrectAns = collC
-    Set collRAnsQ = collRQ
-    collQ.Add lastIndexQ
+    
     Set FindQuestion = collQ
 End Function
 Sub Test()
 
     Dim collQ As Collection
-    Dim collCA As Collection
-    Dim collRAnsQ As Collection
-    
-
-    Set collQ = FindQuestion(collCA, collRAnsQ)
-    'Call Mix(collQ, 1)
-    
+    Dim lIndex As Integer
     Dim i As Integer
-    For i = 1 To collQ.Count - 1
-        Debug.Print "Question Para Index: " & collQ(i) & ", Answer Correct: " & Chr(collCA(i))
+    i = 0
+    Set collQ = FindQuestion(lIndex)
+
+    For Each quest In collQ
+        i = i + 1
+        Debug.Print "Cau " & i & ": firstIndex: " & quest.ParaIndex & ", correctAns: " & quest.CorrectAns
+        Debug.Print "Range Ans:"
+        For Each rq In quest.CollRAns
+            Debug.Print rq.Characters.Count
+        Next
     Next
+    Debug.Print lIndex
+'    Dim r As Range
+'    Set r = ActiveDocument.Range( _
+'        Start:=ActiveDocument.Paragraphs(collQ(7).ParaIndex).Range.Start, _
+'        End:=ActiveDocument.Paragraphs(collQ(8).ParaIndex - 1).Range.End)
+'    r.Select
+'    Selection.Copy
+'    Selection.MoveRight
+'    Selection.Paste
+    Call Mix(collQ, lIndex, 1)
 
 End Sub
 
