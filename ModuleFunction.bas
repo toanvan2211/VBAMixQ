@@ -25,7 +25,7 @@ Function Mix(coll As Collection, lIndex As Integer, typeMix As Integer)
                 Set mRange = wrdDoc.Range( _
                     Start:=wrdDoc.Paragraphs(coll(i).ParaIndex).Range.Start, _
                     End:=wrdDoc.Paragraphs(lIndex).Range.End)
-            ElseIf i < coll.Count - 1 Then
+            ElseIf i <= coll.Count - 1 Then
                 Set mRange = wrdDoc.Range( _
                     Start:=wrdDoc.Paragraphs(coll(i).ParaIndex).Range.Start, _
                     End:=wrdDoc.Paragraphs(coll(i + 1).ParaIndex - 1).Range.End)
@@ -119,9 +119,10 @@ Function FindQuestion(ByRef lastIndexQ As Integer) As Collection
                     Exit Do
                 End If
                 
-                Dim f, chrC As Integer
+                Dim f, chrC, ansR As Integer
                 f = 1
                 chrC = 0
+                ansR = 0
                 
                 'Tim range cua cac cau tra loi va gan vao collection collRAns
                 For Each ch In wrdDoc.Paragraphs(i + t).Range.Characters
@@ -134,6 +135,7 @@ Function FindQuestion(ByRef lastIndexQ As Integer) As Collection
                         
                         
                         If r.Words(1) = Chr(65 + c) Then
+                            ansR = ansR + 1
                             question.CollRAns.Add r  'Gan tap cac range cau tra loi cho collection collRQ
                             c = c + 1
                             lastIndexQ = i + t
@@ -149,6 +151,7 @@ Function FindQuestion(ByRef lastIndexQ As Integer) As Collection
                                 End:=wrdDoc.Paragraphs(i + t).Range.Characters(chrC - 1).End)
                                            
                             If r.Words(1) = Chr(65 + c) Then
+                                ansR = ansR + 1
                                 question.CollRAns.Add r
                                 c = c + 1
                                 lastIndexQ = i + t
@@ -161,6 +164,9 @@ Function FindQuestion(ByRef lastIndexQ As Integer) As Collection
                         End If
                     End If
                 Next
+                If ansR > question.AnsPerRow Then
+                    question.AnsPerRow = ansR
+                End If
                 t = t + 1
             Loop
             
@@ -199,12 +205,8 @@ Sub Test()
     For Each quest In collQ
         i = i + 1
         Debug.Print "Cau " & i & ": firstIndex: " & quest.ParaIndex & ", correctAns: " & quest.CorrectAns
-        Debug.Print "Range Ans:"
-        For Each rq In quest.CollRAns
-            Debug.Print rq.Characters.Count
-        Next
+        Debug.Print quest.AnsPerRow
     Next
-    Debug.Print lIndex
 '    Dim r As Range
 '    Set r = ActiveDocument.Range( _
 '        Start:=ActiveDocument.Paragraphs(collQ(7).ParaIndex).Range.Start, _

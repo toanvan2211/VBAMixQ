@@ -10,6 +10,7 @@ Attribute VB_Exposed = False
 Private mParaIndex As Integer
 Private mCorrectAns As Integer
 Private mCollRAns As Collection
+Private mAnsPerRow As Integer
 'Doan bat dau
 Public Property Get ParaIndex() As Integer
     ParaIndex = mParaIndex
@@ -35,8 +36,17 @@ Public Property Let CollRAns(value As Collection)
     mCollRAns = value
 End Property
 
+' So cau tra loi tren 1 hang
+Public Property Get AnsPerRow() As Integer
+    AnsPerRow = mAnsPerRow
+End Property
+
+Public Property Let AnsPerRow(value As Integer)
+    mAnsPerRow = value
+End Property
 Private Sub Class_Initialize()
     mParaIndex = -1
     mCorrectAns = -1
     Set mCollRAns = New Collection
+    mAnsPerRow = 0
 End Sub
