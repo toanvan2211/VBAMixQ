@@ -9,7 +9,7 @@ Function Mix(coll As Collection, lIndex As Integer, typeMix As Integer)
     Set collNewIndex = New Collection
     'Duyet mang & gan gia tri moi
     For i = 1 To coll.Count
-        rndN = Int(1 + rnd * (4 - 1 + 1))
+        rndN = Int(1 + Rnd * (4 - 1 + 1))
         collNewIndex.Add rndN
     Next i
 
@@ -79,15 +79,16 @@ Function Mix(coll As Collection, lIndex As Integer, typeMix As Integer)
         
         'Sua lai stt cau hoi
         For Each Paragraph In mRange.Paragraphs
-            Debug.Print Paragraph.Range.Words(1)
             If Paragraph.Range.Words(1) = "Câu " Then
                 Paragraph.Range.Words(2).Text = i
                 i = i + 1
             End If
         Next
 
-    ElseIf typeMix = 2 Then 'Tron cau tra loi
-
+    ElseIf typeMix = 2 Then 'Tron cau tat ca tra loi
+        For Each Item In coll
+            Item.MixAns
+        Next
     End If
 End Function
 
@@ -127,7 +128,7 @@ Function FindQuestion(ByRef lastIndexQ As Integer) As Collection
                 'Tim range cua cac cau tra loi va gan vao collection collRAns
                 For Each ch In wrdDoc.Paragraphs(i + t).Range.Characters
                     chrC = chrC + 1
-                    If chrC = wrdDoc.Paragraphs(i + t).Range.Characters.Count Then
+                    If chrC = wrdDoc.Paragraphs(i + t).Range.Characters.Count - 1 Then
                         'Debug.Print "Cuoi Hang o para " & i + t
                         Set r = wrdDoc.Range( _
                             Start:=wrdDoc.Paragraphs(i + t).Range.Characters(f).Start, _
@@ -177,12 +178,23 @@ Function FindQuestion(ByRef lastIndexQ As Integer) As Collection
                 For lo = i + 1 To i + t - 1
                     Dim oFound As Range
                     Set oFound = wrdDoc.Paragraphs(lo).Range
+                    
+                    Dim oFound1 As Range
+                    Set oFound1 = wrdDoc.Paragraphs(lo).Range
+                    
                     With oFound.Find
                         .Font.Underline = True
                         .Wrap = wdFindStop
                     End With
+                    
+                    With oFound1.Find
+                        .Font.Color = vbRed
+                        .Wrap = wdFindStop
+                    End With
+                    
                     oFound.Find.Execute
-                    If oFound.Find.Found = True Then
+                    oFound1.Find.Execute
+                    If oFound1.Find.Found = True Or oFound.Find.Found = True Then
                         question.CorrectAns = Asc(Mid(oFound.Text, 1, 1))
                         Exit For
                     End If
@@ -200,22 +212,16 @@ Sub Test()
     Dim lIndex As Integer
     Dim i As Integer
     i = 0
+    Dim ans As Integer
+    ans = 1
     Set collQ = FindQuestion(lIndex)
-
-    For Each quest In collQ
-        i = i + 1
-        Debug.Print "Cau " & i & ": firstIndex: " & quest.ParaIndex & ", correctAns: " & quest.CorrectAns
-        Debug.Print quest.AnsPerRow
+    
+    Call Mix(collQ, lIndex, 2)
+    
+    For Each Item In collQ
+        Item.UnMarkUnderlineCA
     Next
-'    Dim r As Range
-'    Set r = ActiveDocument.Range( _
-'        Start:=ActiveDocument.Paragraphs(collQ(7).ParaIndex).Range.Start, _
-'        End:=ActiveDocument.Paragraphs(collQ(8).ParaIndex - 1).Range.End)
-'    r.Select
-'    Selection.Copy
-'    Selection.MoveRight
-'    Selection.Paste
-    Call Mix(collQ, lIndex, 1)
+
 
 End Sub
 
