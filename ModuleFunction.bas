@@ -195,6 +195,13 @@ Function FindQuestion(ByRef lastIndexQ As Integer) As Collection
                     oFound.Find.Execute
                     oFound1.Find.Execute
                     If oFound1.Find.Found = True Or oFound.Find.Found = True Then
+                        If oFound1.Find.Found = True And oFound.Find.Found = True Then
+                            question.TypeMarkCA = 3
+                        ElseIf oFound1.Find.Found = True Then
+                            question.TypeMarkCA = 2
+                        ElseIf oFound.Find.Found = True Then
+                            question.TypeMarkCA = 1
+                        End If
                         question.CorrectAns = Asc(Mid(oFound.Text, 1, 1))
                         Exit For
                     End If
@@ -206,43 +213,3 @@ Function FindQuestion(ByRef lastIndexQ As Integer) As Collection
     
     Set FindQuestion = collQ
 End Function
-Sub Test()
-
-    Dim collQ As Collection
-    Dim lIndex As Integer
-    Dim i As Integer
-    i = 0
-    Dim ans As Integer
-    ans = 1
-    Set collQ = FindQuestion(lIndex)
-    
-    Call Mix(collQ, lIndex, 2)
-    
-    For Each Item In collQ
-        Item.UnMarkUnderlineCA
-    Next
-
-
-End Sub
-
-Sub FindUnderlineInDoc()
-    
-    Dim oFound As Range
-    Set oFound = ActiveDocument.Content
-    Dim value As String
-    value = "nothing"
-    With oFound.Find
-        .Font.Underline = True
-        .Wrap = wdFindStop
-        .Execute
-    End With
-    Debug.Print oFound.Text & " - " & CStr(Asc(Mid(oFound.Text, 1, 1)))
-End Sub
-
-Sub Format()
-    ActiveDocument.Paragraphs.TabStops.ClearAll
-    ActiveDocument.Paragraphs.TabStops.Add Position:=CentimetersToPoints(0.5)
-    ActiveDocument.Paragraphs.TabStops.Add Position:=CentimetersToPoints(4.77)
-    ActiveDocument.Paragraphs.TabStops.Add Position:=CentimetersToPoints(9.07)
-    ActiveDocument.Paragraphs.TabStops.Add Position:=CentimetersToPoints(13.36)
-End Sub

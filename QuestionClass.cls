@@ -11,6 +11,7 @@ Private mParaIndex As Integer
 Private mCorrectAns As Integer
 Private mCollRAns As Collection
 Private mAnsPerRow As Integer
+Private mTypeMarkCA As Integer '1 gach chan, 2 la to do, 3 la ca hai
 'Doan bat dau
 Public Property Get ParaIndex() As Integer
     ParaIndex = mParaIndex
@@ -44,11 +45,19 @@ End Property
 Public Property Let AnsPerRow(value As Integer)
     mAnsPerRow = value
 End Property
+Public Property Get TypeMarkCA() As Integer
+    TypeMarkCA = mTypeMarkCA
+End Property
+Public Property Let TypeMarkCA(value As Integer)
+    mTypeMarkCA = value
+End Property
+
 Private Sub Class_Initialize()
     mParaIndex = -1
     mCorrectAns = -1
     Set mCollRAns = New Collection
     mAnsPerRow = 0
+    mTypeMarkCA = -1
 End Sub
 
 Public Sub MixAns()
@@ -102,7 +111,14 @@ Public Sub MixAns()
         i = i + 1
         Item.Words(1) = Chr(i)
         If i = CorrectAns Then
-            Item.Words(1).Font.Underline = True
+            If TypeMarkCA = 1 Then
+                Item.Words(1).Font.Underline = True
+            ElseIf TypeMarkCA = 2 Then
+                Item.Words(1).Font.Color = vbRed
+            ElseIf TypeMarkCA = 3 Then
+                Item.Words(1).Font.Underline = True
+                Item.Words(1).Font.Color = vbRed
+            End If
         End If
     Next
 
