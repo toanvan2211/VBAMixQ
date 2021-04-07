@@ -3,87 +3,37 @@ Function Mix(rangeMix As Range, coll As Collection, lIndex As Integer, typeMix A
 
     Dim rndN, i As Integer
     Dim mRange As Range
-    'Tao mang chua gia tri vi tri moi
-    Dim collNewIndex As Collection
-    Set collNewIndex = New Collection
-    'Duyet mang & gan gia tri moi
-    For i = 1 To coll.Count
-        rndN = Int(1 + Rnd * (4 - 1 + 1))
-        collNewIndex.Add rndN
-    Next i
 
     If typeMix = 1 Then 'Tron cau hoi
-        Dim paraC1, paraC2, paraC3, paraC4 As Integer
-        paraC1 = 0
-        paraC2 = 0
-        paraC3 = 0
-        paraC4 = 0
-
-        For i = 1 To coll.Count
-            If i = coll.Count Then
-                Set mRange = ActiveDocument.Range( _
-                    Start:=rangeMix.Paragraphs(coll(i).ParaIndex).Range.Start, _
-                    End:=rangeMix.Paragraphs(lIndex).Range.End)
-            ElseIf i <= coll.Count - 1 Then
-                Set mRange = ActiveDocument.Range( _
-                    Start:=rangeMix.Paragraphs(coll(i).ParaIndex).Range.Start, _
-                    End:=rangeMix.Paragraphs(coll(i + 1).ParaIndex - 1).Range.End)
+        Dim tempR As Range
+        Set tempR = ActiveDocument.Range( _
+            Start:=rangeMix.Paragraphs(rangeMix.Paragraphs.Count).Range.Characters(1).Start, _
+            End:=rangeMix.Paragraphs(rangeMix.Paragraphs.Count).Range.Characters(1).End)
+        tempR.Move Unit:=wdCharacter, Count:=-1
+        i = 0
+        For Each Item In coll
+            i = i + 1
+            rndN = Int(coll.Count * Rnd) + 1
+            If rndN <> i Then
+                Item.RangeQ.Copy
+                tempR.Paste
+    
+                coll(rndN).RangeQ.Copy
+                Item.RangeQ.Paste
+                
+                tempR.Cut
+                coll(rndN).RangeQ.Paste
             End If
-
-            Select Case collNewIndex(i)
-                Case 1:
-                    rangeMix.Paragraphs(lIndex + paraC1).Range.Select
-                    Selection.MoveRight
-                    mRange.Copy
-                    Selection.Paste
-                    paraC1 = paraC1 + mRange.Paragraphs.Count
-                    paraC2 = paraC2 + mRange.Paragraphs.Count
-                    paraC3 = paraC3 + mRange.Paragraphs.Count
-                    paraC4 = paraC4 + mRange.Paragraphs.Count
-                Case 2:
-                    rangeMix.Paragraphs(lIndex + paraC2).Range.Select
-                    Selection.MoveRight
-                    mRange.Copy
-                    Selection.Paste
-                    paraC2 = paraC2 + mRange.Paragraphs.Count
-                    paraC3 = paraC3 + mRange.Paragraphs.Count
-                    paraC4 = paraC4 + mRange.Paragraphs.Count
-                Case 3:
-                    rangeMix.Paragraphs(lIndex + paraC3).Range.Select
-                    Selection.MoveRight
-                    mRange.Copy
-                    Selection.Paste
-                    paraC3 = paraC3 + mRange.Paragraphs.Count
-                    paraC4 = paraC4 + mRange.Paragraphs.Count
-                Case 4:
-                    rangeMix.Paragraphs(lIndex + paraC4).Range.Select
-                    Selection.MoveRight
-                    mRange.Copy
-                    Selection.Paste
-                    paraC4 = paraC4 + mRange.Paragraphs.Count
-            End Select
-        Next i
-
-        'Xoa phan cau hoi cu
-        Set mRange = ActiveDocument.Range( _
-            Start:=rangeMix.Paragraphs(coll(1).ParaIndex).Range.Start, _
-            End:=rangeMix.Paragraphs(lIndex).Range.End)
-        mRange.Select
-        Selection.Delete
-
-        i = 1
-        Set mRange = ActiveDocument.Range( _
-            Start:=rangeMix.Paragraphs(coll(1).ParaIndex).Range.Start, _
-            End:=rangeMix.Paragraphs(lIndex).Range.End)
+        Next
         
+        i = 1
         'Sua lai stt cau hoi
-        For Each Paragraph In mRange.Paragraphs
+        For Each Paragraph In rangeMix.Paragraphs
             If Paragraph.Range.Words(1) = "Câu " Then
                 Paragraph.Range.Words(2).Text = i
                 i = i + 1
             End If
         Next
-
     ElseIf typeMix = 2 Then 'Tron cau tat ca tra loi
         For Each Item In coll
             Item.MixAns
@@ -108,7 +58,7 @@ Function FindQuestion(ByRef lastIndexQ As Integer, rangeFind As Range) As Collec
         If Paragraph.Range.Words(1) = "Câu " Then
             Set question = New QuestionClass
             Dim r As Range
-            Dim t, c As Integer
+            Dim t, c, endQ As Integer
             t = 1
             c = 0 'So cau tra loi tim thay
             lastIndexQ = i - 1
@@ -132,8 +82,8 @@ Function FindQuestion(ByRef lastIndexQ As Integer, rangeFind As Range) As Collec
                             Start:=rangeFind.Paragraphs(i + t).Range.Characters(f).Start, _
                             End:=rangeFind.Paragraphs(i + t).Range.Characters(chrC).End)
                         
-                        
                         If r.Words(1) = Chr(65 + c) Then
+                            endQ = i + t
                             ansR = ansR + 1
                             question.CollRAns.Add r  'Gan tap cac range cau tra loi cho collection collRQ
                             c = c + 1
@@ -148,8 +98,9 @@ Function FindQuestion(ByRef lastIndexQ As Integer, rangeFind As Range) As Collec
                             Set r = ActiveDocument.Range( _
                                 Start:=rangeFind.Paragraphs(i + t).Range.Characters(f).Start, _
                                 End:=rangeFind.Paragraphs(i + t).Range.Characters(chrC - 1).End)
-                                           
+                            
                             If r.Words(1) = Chr(65 + c) Then
+                                endQ = i + t
                                 ansR = ansR + 1
                                 question.CollRAns.Add r
                                 c = c + 1
@@ -162,6 +113,7 @@ Function FindQuestion(ByRef lastIndexQ As Integer, rangeFind As Range) As Collec
                             Exit For
                         End If
                     End If
+                    
                 Next
                 If ansR > question.AnsPerRow Then
                     question.AnsPerRow = ansR
@@ -170,7 +122,8 @@ Function FindQuestion(ByRef lastIndexQ As Integer, rangeFind As Range) As Collec
             Loop
             
             If c >= 2 Then
-                question.ParaIndex = i
+                question.ParaStartIndex = i
+                Call question.SetRangeQ(i, endQ, rangeFind)
                 
                 Dim lo As Integer
                 For lo = i + 1 To i + t - 1

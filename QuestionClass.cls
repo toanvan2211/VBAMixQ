@@ -7,19 +7,31 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-Private mParaIndex As Integer
+Private mRangeQ As Range
+Private mParaStartIndex As Integer
 Private mCorrectAns As Integer
 Private mCollRAns As Collection
 Private mAnsPerRow As Integer
 Private mTypeMarkCA As Integer '1 gach chan, 2 la to do, 3 la ca hai
-'Doan bat dau
-Public Property Get ParaIndex() As Integer
-    ParaIndex = mParaIndex
+'Range Cau hoi
+Public Property Get RangeQ() As Range
+    Set RangeQ = mRangeQ
 End Property
 
-Public Property Let ParaIndex(value As Integer)
-    mParaIndex = value
+Public Property Let RangeQ(value As Range)
+    mRangeQ = value
 End Property
+
+' Doan bat dau
+
+Public Property Get ParaStartIndex() As Integer
+    ParaStartIndex = mParaStartIndex
+End Property
+
+Public Property Let ParaStartIndex(value As Integer)
+    mParaStartIndex = value
+End Property
+
 ' Dap an dung
 Public Property Get CorrectAns() As Integer
     CorrectAns = mCorrectAns
@@ -51,7 +63,6 @@ End Property
 Public Property Let TypeMarkCA(value As Integer)
     mTypeMarkCA = value
 End Property
-
 Private Sub Class_Initialize()
     mParaIndex = -1
     mCorrectAns = -1
@@ -59,9 +70,12 @@ Private Sub Class_Initialize()
     mAnsPerRow = 0
     mTypeMarkCA = -1
 End Sub
-
-Public Sub MixAns()
-    
+Public Function SetRangeQ(startQ As Integer, endQ As Integer, r As Range)
+    Set mRangeQ = ActiveDocument.Range( _
+        Start:=r.Paragraphs(startQ).Range.Start, _
+        End:=r.Paragraphs(endQ).Range.Characters(r.Paragraphs(endQ).Range.Characters.Count - 1).End)
+End Function
+Public Function MixAns()
     Dim wrdDoc As Document
     Set wrdDoc = Application.ActiveDocument
     Dim rndN, i As Integer
@@ -73,12 +87,12 @@ Public Sub MixAns()
     i = 0
     Dim r As Range
     Set r = wrdDoc.Range( _
-        Start:=wrdDoc.Paragraphs(ParaIndex).Range.Characters(1).Start, _
-        End:=wrdDoc.Paragraphs(ParaIndex).Range.Characters(1).End)
+        Start:=wrdDoc.Paragraphs(1).Range.Characters(1).Start, _
+        End:=wrdDoc.Paragraphs(1).Range.Characters(1).End)
         
     r.Move Unit:=wdCharacter, Count:=-1
-    r.Text = "_temp"
-
+    
+    
     For Each Item In CollRAns
 
         Item.Font.Underline = False
@@ -89,24 +103,27 @@ Public Sub MixAns()
         ElseIf posA + 64 = CorrectAns Then
             CorrectAns = i + 64
         End If
-
-        Item.Copy
-
-        r.Paste
-
-        CollRAns(posA).Copy
-        Item.Paste
-
-        r.Copy
-        CollRAns(posA).Paste
-
-        r.Delete
-
+        
+        If posA <> i Then
+            
+            Item.Copy
+            r.Paste
+    
+            CollRAns(posA).Copy
+            Item.Paste
+            
+            r.Cut
+            CollRAns(posA).Paste
+        End If
+        
+        posA = posA + 1
         If posA > CollRAns.Count Then
             posA = 1
         End If
     Next
-        i = 64
+    
+    
+    i = 64
     For Each Item In CollRAns
         i = i + 1
         Item.Words(1) = Chr(i)
@@ -121,8 +138,8 @@ Public Sub MixAns()
             End If
         End If
     Next
-
-End Sub
+    
+End Function
 
 Public Sub MarkRedCA()
     CollRAns(CorrectAns - 64).Words(1).Font.Color = vbRed
