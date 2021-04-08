@@ -21,27 +21,33 @@ End Sub
 Private Sub BtnRun_Click()
     If OpBtnMixQ = True Then
         'Goi function
-        MixQThisDocument
-        'Dong form
-        Unload frmChooseTypeMix
+        If Me.Tag = "Doc" Then
+            MixQThisDocument
+        ElseIf Me.Tag = "Select" Then
+            MixQTheSelection
+        End If
         'Thong bao
         Application.Assistant.DoAlert UniConvert("Thoong baso", "Telex"), _
             UniConvert("DDax troojn hoafn taast", "Telex"), msoAlertButtonOK _
             , msoAlertIconWarning, 0, 0, 0
     ElseIf OpBtnMixA = True Then
         'Goi function
-        MixAThisDocument
-        'Dong form
-        Unload frmChooseTypeMix
+        If Me.Tag = "Doc" Then
+            MixAThisDocument
+        ElseIf Me.Tag = "Select" Then
+            MixATheSelection
+        End If
         'Thong bao
         Application.Assistant.DoAlert UniConvert("Thoong baso", "Telex"), _
             UniConvert("DDax troojn hoafn taast", "Telex"), msoAlertButtonOK _
             , msoAlertIconWarning, 0, 0, 0
     ElseIf OpBtnMixBoth = True Then
         'Goi function
-        MixBothThisDocument
-        'Dong form
-        Unload frmChooseTypeMix
+        If Me.Tag = "Doc" Then
+            MixBothThisDocument
+        ElseIf Me.Tag = "Select" Then
+            MixBothTheSelection
+        End If
         'Thong bao
         Application.Assistant.DoAlert UniConvert("Thoong baso", "Telex"), _
             UniConvert("DDax troojn hoafn taast", "Telex"), msoAlertButtonOK _
@@ -51,6 +57,7 @@ Private Sub BtnRun_Click()
             UniConvert("Haxy chojn kieeru troojn!", "Telex"), msoAlertButtonOK _
             , msoAlertIconWarning, 0, 0, 0
     End If
+    
 End Sub
 
 Private Sub UserForm_Initialize()

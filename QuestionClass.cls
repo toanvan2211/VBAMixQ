@@ -75,7 +75,7 @@ Public Function SetRangeQ(startQ As Integer, endQ As Integer, r As Range)
         Start:=r.Paragraphs(startQ).Range.Start, _
         End:=r.Paragraphs(endQ).Range.Characters(r.Paragraphs(endQ).Range.Characters.Count - 1).End)
 End Function
-Public Function MixAns()
+Public Function MixAns(rangeMix As Range)
     Dim wrdDoc As Document
     Set wrdDoc = Application.ActiveDocument
     Dim rndN, i As Integer
@@ -87,8 +87,8 @@ Public Function MixAns()
     i = 0
     Dim r As Range
     Set r = wrdDoc.Range( _
-        Start:=wrdDoc.Paragraphs(1).Range.Characters(1).Start, _
-        End:=wrdDoc.Paragraphs(1).Range.Characters(1).End)
+        Start:=rangeMix.Paragraphs(ParaStartIndex).Range.Characters(1).Start, _
+        End:=rangeMix.Paragraphs(ParaStartIndex).Range.Characters(1).End)
         
     r.Move Unit:=wdCharacter, Count:=-1
     

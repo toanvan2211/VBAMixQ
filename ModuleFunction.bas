@@ -36,7 +36,7 @@ Function Mix(rangeMix As Range, coll As Collection, lIndex As Integer, typeMix A
         Next
     ElseIf typeMix = 2 Then 'Tron cau tat ca tra loi
         For Each Item In coll
-            Item.MixAns
+            Call Item.MixAns(rangeMix)
         Next
     End If
 End Function
@@ -46,8 +46,8 @@ Function FindQuestion(ByRef lastIndexQ As Integer, rangeFind As Range) As Collec
     
     Dim i As Integer
     ' Collection cau hoi
-    Dim collQ As Collection
-    Set collQ = New Collection
+    Dim CollQ As Collection
+    Set CollQ = New Collection
     
     Dim question As QuestionClass
     
@@ -159,10 +159,10 @@ Function FindQuestion(ByRef lastIndexQ As Integer, rangeFind As Range) As Collec
                         Exit For
                     End If
                 Next
-                collQ.Add question
+                CollQ.Add question
             End If
         End If
     Next
     
-    Set FindQuestion = collQ
+    Set FindQuestion = CollQ
 End Function
