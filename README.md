@@ -10,6 +10,12 @@ Macro có thể khoanh vùng câu hỏi, nhận diện **câu hỏi**, **câu tr
 
 Có thể trộn trực tiếp trên file hiện tại, hoặc xuất ra file khác
 
+## Quy định về chuẩn đề trắc nghiệm
+* Các câu hỏi bắt đầu bằng từ khoá `"Câu"`.
+* Mỗi câu hỏi phải có lớn hơn hoặc từ 2 câu trả lời.
+* Các câu trả lời đúng được đánh dấu bằng `Gạch chân` hoặc `Tô đỏ`.
+* Các phần câu hỏi dạng chùm (1 nội dung có nhiều câu hỏi cho nội dung đó): đánh dấu `#` ở đầu và cuối phần câu hỏi chùm.
+
 ## Chức năng
 * Trộn đề thi
   * - [x] Chỉ trộn câu hỏi
@@ -25,6 +31,7 @@ Có thể trộn trực tiếp trên file hiện tại, hoặc xuất ra file kh
   - [x] Bỏ đánh dấu
   - [x] Điều chỉnh size chữ vùng câu hỏi trắc nghiệm
   - [x] Điều chỉnh alignment vùng câu hỏi trắc nghiệm
+  - [ ] Thêm dấu chấm cuối câu trả lời
   
 ```VBA
 Dim str As String
