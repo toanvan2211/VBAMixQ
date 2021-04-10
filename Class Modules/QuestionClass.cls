@@ -85,6 +85,7 @@ Public Function MixAns(rangeMix As Range)
     posA = Int((CollRAns.Count - 2 + 1) * Rnd + 2) ' new position
 
     i = 0
+    
     Dim r As Range
     Set r = wrdDoc.Range( _
         Start:=rangeMix.Paragraphs(ParaStartIndex).Range.Characters(1).Start, _
@@ -96,6 +97,7 @@ Public Function MixAns(rangeMix As Range)
     For Each Item In CollRAns
 
         Item.Font.Underline = False
+        Item.Font.Color = vbBlack
         i = i + 1
 
         If i + 64 = CorrectAns Then

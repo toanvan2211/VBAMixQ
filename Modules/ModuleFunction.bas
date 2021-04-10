@@ -1,15 +1,15 @@
 Attribute VB_Name = "ModuleFunction"
 Function Mix(rangeMix As Range, coll As Collection, lIndex As Integer, typeMix As Integer)
-
     Dim rndN, i As Integer
     Dim mRange As Range
-
+    
     If typeMix = 1 Then 'Tron cau hoi
+        Dim doc As Document
+        Set doc = New Document
+        
         Dim tempR As Range
-        Set tempR = ActiveDocument.Range( _
-            Start:=rangeMix.Paragraphs(rangeMix.Paragraphs.Count).Range.Characters(1).Start, _
-            End:=rangeMix.Paragraphs(rangeMix.Paragraphs.Count).Range.Characters(1).End)
-        tempR.Move Unit:=wdCharacter, Count:=-1
+        Set tempR = doc.Range
+        tempR.Move Unit:=wdCharacter, Count:=2
         i = 0
         For Each Item In coll
             i = i + 1
@@ -25,12 +25,12 @@ Function Mix(rangeMix As Range, coll As Collection, lIndex As Integer, typeMix A
                 coll(rndN).RangeQ.Paste
             End If
         Next
-        
+        doc.Close SaveChanges:=wdDoNotSaveChanges
         i = 1
         'Sua lai stt cau hoi
-        For Each Paragraph In rangeMix.Paragraphs
-            If Paragraph.Range.Words(1) = "Câu " Then
-                Paragraph.Range.Words(2).Text = i
+        For Each Item In coll
+            If Item.RangeQ.Words(1) = "Câu " Then
+                Item.RangeQ.Words(2).Text = i
                 i = i + 1
             End If
         Next

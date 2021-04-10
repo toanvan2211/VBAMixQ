@@ -2,14 +2,14 @@ Attribute VB_Name = "ModuleSub"
 ' Tron tat ca tren tai lieu hien tai
 Sub MixBothThisDocument()
 
-    Dim CollQ As Collection
+    Dim coll As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = ActiveDocument.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    Call Mix(rangeFind, CollQ, lIndex, 2)
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    Call Mix(rangeFind, CollQ, lIndex, 1)
+    Set coll = FindQuestion(lIndex, rangeFind)
+    Call Mix(rangeFind, coll, lIndex, 2)
+    Set coll = FindQuestion(lIndex, rangeFind)
+    Call Mix(rangeFind, coll, lIndex, 1)
     
 End Sub
 Sub MixQThisDocument()
@@ -127,73 +127,111 @@ Sub UnMarkUnderlineCA()
         Item.UnMarkUnderlineCA
     Next
 End Sub
+Sub MarkQuestionOrder()
 
-Sub MixToNewDocument(mixCount As Integer)
+    Dim coll As Collection
+    Dim lIndex As Integer
+    Dim rangeFind As Range
+    Set rangeFind = ActiveDocument.Range
+    Set coll = FindQuestion(lIndex, rangeFind)
     Dim i As Integer
+    i = 0
+    For Each Item In coll
+        i = i + 1
+        Item.RangeQ.Words(2) = i
+    Next
     
-    Dim oFSO As Object
-    Dim oFolder As Object
-    
-    Set oFSO = CreateObject("Scripting.FileSystemObject")
+End Sub
+' Xuat de khong kem dap an
+Sub MixToNewDocument(mixCount As Integer)
+
+    Dim i, countDoc As Integer
     
     Dim path, nameThisFile As String
     nameThisFile = Left(ThisDocument.Name, InStr(ThisDocument.Name, ".") - 1)
-    path = ThisDocument.path & Application.PathSeparator
     
-    Set oFolder = oFSO.GetFolder(path)
-    Dim countDoc As Integer
-    For Each oFile In oFolder.Files
-        Dim os
-        os = Left(oFile.Name, InStr(oFile.Name, ".") - 1)
-        If Left(os, Len(os) - 1) = Left(ThisDocument.Name, InStr(ThisDocument.Name, ".") - 1) & "_De" Then
-            countDoc = CInt(Right(os, 1))
-        End If
-    Next
+    Dim CollQ As Collection
+    Dim rangeFind As Range
+    Set rangeFind = ActiveDocument.Range
+    Dim lIndex As Integer
+    Set CollQ = FindQuestion(lIndex, rangeFind)
     
     For i = 1 To mixCount
+        countDoc = -1
+        Do
+            countDoc = countDoc + 1
+            path = ThisDocument.path & Application.PathSeparator & nameThisFile & "_De" & countDoc + i & ".docx"
+        Loop While Dir(path, vbNormal) <> ""
         
-        path = ThisDocument.path & Application.PathSeparator & nameThisFile & "_De" & countDoc + i & ".docx"
+        
         Debug.Print path 'debug
         Dim doc As Document
         Set doc = New Document
-        
+
         ThisDocument.Content.Copy
         doc.Content.Paste
         
-        Dim CollQ As Collection
-        Dim rangeFind As Range
-        Set rangeFind = doc.Range
-        
-        Dim lIndex As Integer
-        Set CollQ = FindQuestion(lIndex, rangeFind)
         Call Mix(rangeFind, CollQ, lIndex, 2)
-        Set CollQ = FindQuestion(lIndex, rangeFind) 'Tim cach toi uu
-        Call Mix(rangeFind, CollQ, lIndex, 1)
         
+        Dim newRangeFind As Range
+        Set newRangeFind = doc.Range
+        Dim newCollQ As Collection
+        
+        Set newCollQ = FindQuestion(lIndex, newRangeFind) 'Tim cach toi uu
+        Call Mix(newRangeFind, newCollQ, lIndex, 1)
+
         doc.SaveAs FileName:=path
         doc.Close
     Next
-End Sub
 
-Sub Test()
-    Dim oFSO As Object
-    Dim oFolder As Object
-    Dim i As Integer
+
+End Sub
+'Xuat dap an
+Sub ExportListAns()
+    Dim coll As Collection
+    Dim lIndex As Integer
+    Dim rangeFind As Range
+    Set rangeFind = ActiveDocument.Range
+    Set coll = FindQuestion(lIndex, rangeFind)
     
-    Set oFSO = CreateObject("Scripting.FileSystemObject")
+    Dim intNoOfRows, intNoOfColumns As Integer
+    Dim objDoc As Document
+    Dim objRange
+    Dim objTable
     
+    
+    intNoOfRows = Fix(coll.Count / 4)
+    If coll.Count Mod 4 <> 0 Then
+        intNoOfRows = intNoOfRows + 1
+    End If
+    
+    
+    intNoOfColumns = 4
+    
+    Set objDoc = Documents.Add
+
+    Set objRange = objDoc.Range
+
+    objDoc.Tables.Add objRange, intNoOfRows, intNoOfColumns
+
+    Set objTable = objDoc.Tables(1)
+
+    objTable.Borders.Enable = True
+    Dim ansCount As Integer
+    ansCount = 0
+    For i = 1 To intNoOfRows
+        For j = 1 To intNoOfColumns
+            ansCount = ansCount + 1
+            If ansCount > coll.Count Then
+                Exit For
+            End If
+            objTable.Cell(i, j).Range.Text = ansCount & ". " & Chr(coll(ansCount).CorrectAns)
+        Next
+    Next
     Dim path, nameThisFile As String
     nameThisFile = Left(ThisDocument.Name, InStr(ThisDocument.Name, ".") - 1)
-    path = ThisDocument.path & Application.PathSeparator
-    
-    Set oFolder = oFSO.GetFolder(path)
-    Dim countDoc As Integer
-    For Each oFile In oFolder.Files
-        Dim os
-        os = Left(oFile.Name, InStr(oFile.Name, ".") - 1)
-        If Left(os, Len(os) - 1) = Left(ThisDocument.Name, InStr(ThisDocument.Name, ".") - 1) & "_De" Then
-            countDoc = CInt(Right(os, 1))
-        End If
-    Next
-    
+    path = ThisDocument.path & Application.PathSeparator & nameThisFile & "_DapAn.docx"
+    objDoc.SaveAs FileName:=path, FileFormat:=wdFormatXMLDocument, AddtoRecentFiles:=False
+    objDoc.Close
 End Sub
+' Xuat de kem dap an

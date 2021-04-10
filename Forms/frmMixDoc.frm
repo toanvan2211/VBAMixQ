@@ -18,7 +18,7 @@ Option Explicit
 Private Sub btnOk_Click()
 
     If IsNumeric(tbMixCount.Text) Then
-    
+        
         MixToNewDocument (tbMixCount.Text)
         
         Application.Assistant.DoAlert UniConvert("Thoong basn", "Telex"), _
