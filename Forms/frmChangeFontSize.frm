@@ -26,15 +26,15 @@ Private Sub btnOk_Click()
     
     If IsNumeric(tbSize.Text) Then
     
-        Dim CollQ As Collection
+        Dim collQ As Collection
         Dim lIndex As Integer
         Dim rangeFind As Range
         Set rangeFind = ActiveDocument.Range
-        Set CollQ = FindQuestion(lIndex, rangeFind)
+        Set collQ = FindQuestion(lIndex, rangeFind)
         
         Dim r As Range
         Set r = ActiveDocument.Range( _
-            Start:=rangeFind.Paragraphs(CollQ(1).ParaStartIndex).Range.Start, _
+            Start:=rangeFind.Paragraphs(collQ(1).ParaStartIndex).Range.Start, _
             End:=rangeFind.Paragraphs(lIndex).Range.End)
         r.Font.Size = tbSize.Text
         Unload frmChangeFontSize

@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmMixDoc 
    Caption         =   "Input"
-   ClientHeight    =   2445
+   ClientHeight    =   2715
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   3795
@@ -19,7 +19,7 @@ Private Sub btnOk_Click()
 
     If IsNumeric(tbMixCount.Text) Then
         
-        MixToNewDocument (tbMixCount.Text)
+        MixToNewDocument tbMixCount.Text, cbAttachAns.value
         
         Application.Assistant.DoAlert UniConvert("Thoong basn", "Telex"), _
             UniConvert("Quas trifnh troojn ddax hoafn taast", "Telex"), msoAlertButtonOK _
@@ -38,5 +38,5 @@ Private Sub UserForm_Initialize()
 
     btnOk.Caption = UniConvert("Xasc nhaajn", "Telex")
     lbMixCount.Caption = UniConvert("Soos ddeef troojn: ", "Telex")
-    
+    cbAttachAns.Caption = UniConvert("Xuaast kefm ddasp asn", "Telex")
 End Sub

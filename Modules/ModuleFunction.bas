@@ -15,14 +15,20 @@ Function Mix(rangeMix As Range, coll As Collection, lIndex As Integer, typeMix A
             i = i + 1
             rndN = Int(coll.Count * Rnd) + 1
             If rndN <> i Then
+                Dim tempAns As Integer
+                
+            
                 Item.RangeQ.Copy
+                tempAns = Item.CorrectAns
                 tempR.Paste
     
                 coll(rndN).RangeQ.Copy
+                Item.CorrectAns = coll(rndN).CorrectAns
                 Item.RangeQ.Paste
                 
                 tempR.Cut
                 coll(rndN).RangeQ.Paste
+                coll(rndN).CorrectAns = tempAns
             End If
         Next
         doc.Close SaveChanges:=wdDoNotSaveChanges
@@ -46,8 +52,8 @@ Function FindQuestion(ByRef lastIndexQ As Integer, rangeFind As Range) As Collec
     
     Dim i As Integer
     ' Collection cau hoi
-    Dim CollQ As Collection
-    Set CollQ = New Collection
+    Dim collQ As Collection
+    Set collQ = New Collection
     
     Dim question As QuestionClass
     
@@ -159,10 +165,51 @@ Function FindQuestion(ByRef lastIndexQ As Integer, rangeFind As Range) As Collec
                         Exit For
                     End If
                 Next
-                CollQ.Add question
+                collQ.Add question
             End If
         End If
     Next
     
-    Set FindQuestion = CollQ
+    Set FindQuestion = collQ
+End Function
+
+'Tao bang dap an
+Function CreateTableOfAns(coll As Collection, wrdDoc As Document) As Object
+    
+    Dim objTable
+    
+    
+    intNoOfRows = Fix(coll.Count / 4)
+    If coll.Count Mod 4 <> 0 Then
+        intNoOfRows = intNoOfRows + 1
+    End If
+    
+    
+    intNoOfColumns = 4
+    
+
+    Set objRange = wrdDoc.Range( _
+        Start:=wrdDoc.Paragraphs(wrdDoc.Paragraphs.Count).Range.Characters(wrdDoc.Paragraphs(wrdDoc.Paragraphs.Count).Range.Characters.Count).Start, _
+        End:=wrdDoc.Paragraphs(wrdDoc.Paragraphs.Count).Range.Characters(wrdDoc.Paragraphs(wrdDoc.Paragraphs.Count).Range.Characters.Count).End)
+        
+
+    wrdDoc.Tables.Add objRange, intNoOfRows, intNoOfColumns
+
+    Set objTable = wrdDoc.Tables(wrdDoc.Tables.Count)
+
+    objTable.Borders.Enable = True
+    Dim ansCount As Integer
+    ansCount = 0
+    For i = 1 To intNoOfRows
+        For j = 1 To intNoOfColumns
+            ansCount = ansCount + 1
+            If ansCount > coll.Count Then
+                Exit For
+            End If
+            objTable.Cell(i, j).Range.Text = ansCount & ". " & Chr(coll(ansCount).CorrectAns)
+        Next
+    Next
+    
+    Set CreateTableOfAns = objTable
+    
 End Function

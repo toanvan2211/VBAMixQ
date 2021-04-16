@@ -14,69 +14,69 @@ Sub MixBothThisDocument()
 End Sub
 Sub MixQThisDocument()
 
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = ActiveDocument.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    Call Mix(rangeFind, CollQ, lIndex, 1)
+    Set collQ = FindQuestion(lIndex, rangeFind)
+    Call Mix(rangeFind, collQ, lIndex, 1)
     
 End Sub
 
 Sub MixAThisDocument()
 
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = ActiveDocument.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    Call Mix(rangeFind, CollQ, lIndex, 2)
+    Set collQ = FindQuestion(lIndex, rangeFind)
+    Call Mix(rangeFind, collQ, lIndex, 2)
     
 End Sub
 Sub MixBothTheSelection()
 
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = Selection.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    Call Mix(rangeFind, CollQ, lIndex, 2)
-    Set CollQ = FindQuestion(lIndex, rangeFind) 'Tim cach toi uu
-    Call Mix(rangeFind, CollQ, lIndex, 1)
+    Set collQ = FindQuestion(lIndex, rangeFind)
+    Call Mix(rangeFind, collQ, lIndex, 2)
+    Set collQ = FindQuestion(lIndex, rangeFind) 'Tim cach toi uu
+    Call Mix(rangeFind, collQ, lIndex, 1)
     
 End Sub
 Sub MixATheSelection()
 
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = Selection.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    Call Mix(rangeFind, CollQ, lIndex, 2)
+    Set collQ = FindQuestion(lIndex, rangeFind)
+    Call Mix(rangeFind, collQ, lIndex, 2)
     
 End Sub
 Sub MixQTheSelection()
 
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = Selection.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    Call Mix(rangeFind, CollQ, lIndex, 1)
+    Set collQ = FindQuestion(lIndex, rangeFind)
+    Call Mix(rangeFind, collQ, lIndex, 1)
     
 End Sub
 
 'Format
 Sub FormatTabStop()
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = ActiveDocument.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
+    Set collQ = FindQuestion(lIndex, rangeFind)
     
     Dim r As Range
     Set r = ActiveDocument.Range( _
-        Start:=rangeFind.Paragraphs(CollQ(1).ParaStartIndex).Range.Start, _
+        Start:=rangeFind.Paragraphs(collQ(1).ParaStartIndex).Range.Start, _
         End:=rangeFind.Paragraphs(lIndex).Range.End)
     r.Paragraphs.TabStops.ClearAll
     r.Paragraphs.TabStops.Add Position:=CentimetersToPoints(0.5)
@@ -88,42 +88,42 @@ Sub FormatTabStop()
 End Sub
 
 Sub MarkRedCA()
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = ActiveDocument.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    For Each Item In CollQ
+    Set collQ = FindQuestion(lIndex, rangeFind)
+    For Each Item In collQ
         Item.MarkRedCA
     Next
 End Sub
 Sub UnMarkRedCA()
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = ActiveDocument.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    For Each Item In CollQ
+    Set collQ = FindQuestion(lIndex, rangeFind)
+    For Each Item In collQ
         Item.UnMarkRedCA
     Next
 End Sub
 Sub MarkUnderlineCA()
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = ActiveDocument.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    For Each Item In CollQ
+    Set collQ = FindQuestion(lIndex, rangeFind)
+    For Each Item In collQ
         Item.MarkUnderlineCA
     Next
 End Sub
 Sub UnMarkUnderlineCA()
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim lIndex As Integer
     Dim rangeFind As Range
     Set rangeFind = ActiveDocument.Range
-    Set CollQ = FindQuestion(lIndex, rangeFind)
-    For Each Item In CollQ
+    Set collQ = FindQuestion(lIndex, rangeFind)
+    For Each Item In collQ
         Item.UnMarkUnderlineCA
     Next
 End Sub
@@ -142,19 +142,19 @@ Sub MarkQuestionOrder()
     Next
     
 End Sub
-' Xuat de khong kem dap an
-Sub MixToNewDocument(mixCount As Integer)
+' Xuat de
+Sub MixToNewDocument(mixCount As Integer, AttachAns As Boolean)
 
     Dim i, countDoc As Integer
     
     Dim path, nameThisFile As String
     nameThisFile = Left(ThisDocument.Name, InStr(ThisDocument.Name, ".") - 1)
     
-    Dim CollQ As Collection
+    Dim collQ As Collection
     Dim rangeFind As Range
     Set rangeFind = ActiveDocument.Range
     Dim lIndex As Integer
-    Set CollQ = FindQuestion(lIndex, rangeFind)
+    Set collQ = FindQuestion(lIndex, rangeFind)
     
     For i = 1 To mixCount
         countDoc = -1
@@ -171,7 +171,7 @@ Sub MixToNewDocument(mixCount As Integer)
         ThisDocument.Content.Copy
         doc.Content.Paste
         
-        Call Mix(rangeFind, CollQ, lIndex, 2)
+        Call Mix(rangeFind, collQ, lIndex, 2)
         
         Dim newRangeFind As Range
         Set newRangeFind = doc.Range
@@ -179,13 +179,21 @@ Sub MixToNewDocument(mixCount As Integer)
         
         Set newCollQ = FindQuestion(lIndex, newRangeFind) 'Tim cach toi uu
         Call Mix(newRangeFind, newCollQ, lIndex, 1)
-
+        
+        'Tuy chon xuat dap an
+        If AttachAns = True Then
+            Dim objTable
+            objTable = CreateTableOfAns(newCollQ, doc)
+        End If
+                
         doc.SaveAs FileName:=path
         doc.Close
     Next
 
 
 End Sub
+
+
 'Xuat dap an
 Sub ExportListAns()
     Dim coll As Collection
@@ -200,38 +208,30 @@ Sub ExportListAns()
     Dim objTable
     
     
-    intNoOfRows = Fix(coll.Count / 4)
-    If coll.Count Mod 4 <> 0 Then
-        intNoOfRows = intNoOfRows + 1
-    End If
-    
-    
-    intNoOfColumns = 4
-    
     Set objDoc = Documents.Add
+    
+    objTable = CreateTableOfAns(coll, objDoc)
 
-    Set objRange = objDoc.Range
-
-    objDoc.Tables.Add objRange, intNoOfRows, intNoOfColumns
-
-    Set objTable = objDoc.Tables(1)
-
-    objTable.Borders.Enable = True
-    Dim ansCount As Integer
-    ansCount = 0
-    For i = 1 To intNoOfRows
-        For j = 1 To intNoOfColumns
-            ansCount = ansCount + 1
-            If ansCount > coll.Count Then
-                Exit For
-            End If
-            objTable.Cell(i, j).Range.Text = ansCount & ". " & Chr(coll(ansCount).CorrectAns)
-        Next
-    Next
     Dim path, nameThisFile As String
     nameThisFile = Left(ThisDocument.Name, InStr(ThisDocument.Name, ".") - 1)
     path = ThisDocument.path & Application.PathSeparator & nameThisFile & "_DapAn.docx"
+    'Save replace
     objDoc.SaveAs FileName:=path, FileFormat:=wdFormatXMLDocument, AddtoRecentFiles:=False
     objDoc.Close
 End Sub
-' Xuat de kem dap an
+
+'Them dap an vao cuoi doc
+Sub InsertListAns()
+    Dim coll As Collection
+    Dim lIndex As Integer
+    Dim rangeFind As Range
+    Set rangeFind = ActiveDocument.Range
+    Set coll = FindQuestion(lIndex, rangeFind)
+    
+    Dim intNoOfRows, intNoOfColumns As Integer
+    Dim objRange
+    Dim objTable
+    
+    objTable = CreateTableOfAns(coll, ActiveDocument)
+    
+End Sub
