@@ -24,6 +24,7 @@ Có thể trộn trực tiếp trên file hiện tại, hoặc xuất ra file kh
     * - [x] Trộn đề trên tài liệu hiện tại
     * - [x] Trộn vùng được tô đen
     * - [x] Trộn đề và xuất đề
+    * - [x] Xuất đáp án
     * - [ ] Trộn đề và xuất đề kèm đáp án
 * Format đề thi
   - [x] Canh lề tabstop
