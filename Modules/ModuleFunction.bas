@@ -6,10 +6,10 @@ Function Mix(rangeMix As Range, coll As Collection, lIndex As Integer, typeMix A
     If typeMix = 1 Then 'Tron cau hoi
         Dim doc As Document
         Set doc = New Document
-        
+        doc.ActiveWindow.Visible = False
         Dim tempR As Range
         Set tempR = doc.Range
-        tempR.Move Unit:=wdCharacter, Count:=2
+        tempR.Move Unit:=wdCharacter, Count:=1
         i = 0
         For Each Item In coll
             i = i + 1

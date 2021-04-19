@@ -57,9 +57,6 @@ Private Sub BtnRun_Click()
             UniConvert("Haxy chojn kieeru troojn!", "Telex"), msoAlertButtonOK _
             , msoAlertIconWarning, 0, 0, 0
     End If
-    If Me.Tag = "Select" Then
-        Unload frmChooseTypeMix
-    End If
 End Sub
 
 Private Sub UserForm_Initialize()

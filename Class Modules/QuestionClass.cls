@@ -19,7 +19,7 @@ Public Property Get RangeQ() As Range
 End Property
 
 Public Property Let RangeQ(value As Range)
-    mRangeQ = value
+    Set mRangeQ = value
 End Property
 
 ' Doan bat dau
@@ -46,7 +46,7 @@ Public Property Get CollRAns() As Collection
 End Property
 
 Public Property Let CollRAns(value As Collection)
-    mCollRAns = value
+    Set mCollRAns = value
 End Property
 
 ' So cau tra loi tren 1 hang
@@ -87,12 +87,9 @@ Public Function MixAns(rangeMix As Range)
     i = 0
     
     Dim r As Range
-    Set r = wrdDoc.Range( _
-        Start:=rangeMix.Paragraphs(ParaStartIndex).Range.Characters(1).Start, _
-        End:=rangeMix.Paragraphs(ParaStartIndex).Range.Characters(1).End)
+    Set r = wrdDoc.Range
         
-    r.Move Unit:=wdCharacter, Count:=-1
-    
+    r.Move Unit:=wdCharacter, Count:=1
     
     For Each Item In CollRAns
 
@@ -124,6 +121,11 @@ Public Function MixAns(rangeMix As Range)
         End If
     Next
     
+    Set mRangeQ = ActiveDocument.Range( _
+        Start:=RangeQ.Characters(1).Start, _
+        End:=CollRAns(CollRAns.Count).End)
+    RangeQ.Select
+    
     
     i = 64
     For Each Item In CollRAns
@@ -154,4 +156,15 @@ Public Sub MarkUnderlineCA()
 End Sub
 Public Sub UnMarkUnderlineCA()
     CollRAns(CorrectAns - 64).Words(1).Font.Underline = False
+End Sub
+'Them dau cham o cuoi cau tra loi
+Public Sub DotMarkEndAns()
+    For Each Item In CollRAns
+    
+        If Item.Characters(Item.Characters.Count) <> "." Then
+            Item.Select
+            Selection.MoveRight Unit:=wdCharacter, Count:=1
+            Selection.Text = "."
+        End If
+    Next
 End Sub
