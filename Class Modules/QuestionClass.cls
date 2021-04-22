@@ -168,3 +168,88 @@ Public Sub DotMarkEndAns()
         End If
     Next
 End Sub
+
+Public Sub ScanQuestion()
+    Dim f, chrC, ansR, i, charcode As Integer
+    f = 1
+    ansR = 0
+    charcode = 65
+    For i = 1 To RangeQ.Paragraphs.Count
+        chrC = 0
+        If RangeQ.Paragraphs(i).Range.Words(1) = Chr(charcode) Then
+            'Tim range cua cac cau tra loi va gan vao collection collRAns
+            For Each ch In RangeQ.Paragraphs(i).Range.Characters
+                chrC = chrC + 1
+                If chrC = RangeQ.Paragraphs(i).Range.Characters.Count - 1 Then
+                    'Debug.Print "Cuoi Hang o para " & i
+                    Set r = ActiveDocument.Range( _
+                        Start:=RangeQ.Paragraphs(i).Range.Characters(f).Start, _
+                        End:=RangeQ.Paragraphs(i).Range.Characters(chrC).End)
+                    
+                    If r.Words(1) = Chr(charcode) Then
+                        ansR = ansR + 1
+                        CollRAns.Add r  'Gan tap cac range cau tra loi cho collection collRQ
+                        charcode = charcode + 1
+                    End If
+                    Exit For
+                ElseIf ch = Chr(9) Then
+                    'Debug.Print "Tab o para " & i
+                    If chrC - 1 = 0 Then
+                        f = chrC + 1
+                    ElseIf chrC - 1 > 0 Then
+                        Set r = ActiveDocument.Range( _
+                            Start:=RangeQ.Paragraphs(i).Range.Characters(f).Start, _
+                            End:=RangeQ.Paragraphs(i).Range.Characters(chrC - 1).End)
+                        
+                        If r.Words(1) = Chr(charcode) Then
+                            ansR = ansR + 1
+                            CollRAns.Add r
+                            charcode = charcode + 1
+                        End If
+                        f = chrC + 1
+                    End If
+                    
+                    If f > RangeQ.Paragraphs(i).Range.Characters.Count Then
+                        Exit For
+                    End If
+                End If
+                
+            Next
+            If ansR > AnsPerRow Then
+                AnsPerRow = ansR
+            End If
+        End If
+        
+        Dim oFound As Range
+        Set oFound = RangeQ.Paragraphs(i).Range
+        
+        Dim oFound1 As Range
+        Set oFound1 = RangeQ.Paragraphs(i).Range
+        
+        With oFound.Find
+            .Font.Underline = True
+            .Wrap = wdFindStop
+        End With
+        
+        With oFound1.Find
+            .Font.Color = vbRed
+            .Wrap = wdFindStop
+        End With
+        
+        oFound.Find.Execute
+        oFound1.Find.Execute
+        If oFound1.Find.Found = True Or oFound.Find.Found = True Then
+            If oFound1.Find.Found = True And oFound.Find.Found = True Then
+                TypeMarkCA = 3
+                CorrectAns = Asc(Mid(oFound.Text, 1, 1))
+            ElseIf oFound1.Find.Found = True Then
+                TypeMarkCA = 2
+                CorrectAns = Asc(Mid(oFound1.Text, 1, 1))
+            ElseIf oFound.Find.Found = True Then
+                TypeMarkCA = 1
+                CorrectAns = Asc(Mid(oFound.Text, 1, 1))
+            End If
+        End If
+        
+    Next i
+End Sub
