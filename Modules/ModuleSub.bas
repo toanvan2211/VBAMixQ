@@ -11,6 +11,7 @@ Sub MixBothThisDocument()
     Call Mix(rangeFind, coll, lIndex, 1)
     
 End Sub
+
 Sub MixQThisDocument()
 
     Dim collQ As Collection
@@ -21,7 +22,6 @@ Sub MixQThisDocument()
     Call Mix(rangeFind, collQ, lIndex, 1)
     
 End Sub
-
 Sub MixAThisDocument()
 
     Dim collQ As Collection
